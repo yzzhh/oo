@@ -15,7 +15,6 @@ concurrency:
 
 jobs:
   test:
-    if: false
     name: API Tests
     runs-on: ubuntu-latest
     strategy:

@@ -11,7 +11,6 @@ concurrency:
 
 jobs:
   python-style:
-    if: false
     name: Python Style
     runs-on: ubuntu-latest
 
@@ -53,7 +52,6 @@ jobs:
   web-style:
     name: Web Style
     runs-on: ubuntu-latest
-    if: false
     defaults:
       run:
         working-directory: ./web
@@ -86,7 +84,6 @@ jobs:
 
 
   superlinter:
-    if: false
     name: SuperLinter
     runs-on: ubuntu-latest
 
