@@ -125,6 +125,7 @@ cohere = "~5.2.4"
 dashscope = { version = "~1.17.0", extras = ["tokenizer"] }
 fal-client = "0.5.6"
 flask = "~3.0.1"
+flask-caching = "~2.3.0"
 flask-compress = "~1.14"
 flask-cors = "~4.0.0"
 flask-login = "~0.6.3"

@@ -3,7 +3,9 @@ from flask_login import current_user
 from flask_restful import Resource, fields, marshal_with
 from werkzeug.exceptions import Forbidden
 
+from controllers.service_api.wraps import get_api_token_from_db
 from extensions.ext_database import db
+from extensions.ext_redis import cache
 from libs.helper import TimestampField
 from libs.login import login_required
 from models.dataset import Dataset
@@ -115,6 +117,7 @@ class BaseApiKeyResource(Resource):
         db.session.query(ApiToken).filter(ApiToken.id == api_key_id).delete()
         db.session.commit()
 
+        cache.delete_memoized(get_api_token_from_db, key.token, self.resource_type)
         return {"result": "success"}, 204
 
 
