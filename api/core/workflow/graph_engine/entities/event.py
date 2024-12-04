@@ -32,6 +32,12 @@ class GraphRunSucceededEvent(BaseGraphEvent):
 
 class GraphRunFailedEvent(BaseGraphEvent):
     error: str = Field(..., description="failed reason")
+    exceptions_count: int = Field(..., description="exception count")
+
+
+class GraphRunPartialSucceededEvent(BaseGraphEvent):
+    exceptions_count: int = Field(..., description="exception count")
+    outputs: Optional[dict[str, Any]] = None
 
 
 ###########################################
@@ -79,6 +85,10 @@ class NodeRunSucceededEvent(BaseNodeEvent):
 
 
 class NodeRunFailedEvent(BaseNodeEvent):
+    error: str = Field(..., description="error")
+
+
+class NodeRunExceptionEvent(BaseNodeEvent):
     error: str = Field(..., description="error")
 
 
