@@ -21,18 +21,28 @@ from core.rag.models.document import Document
 from core.tools.utils.text_processing_utils import remove_leading_symbols
 from libs import helper
 from models.dataset import Dataset
+from services.entities.knowledge_entities.knowledge_entities import Rule
 
 
 class QAIndexProcessor(BaseIndexProcessor):
     def extract(self, extract_setting: ExtractSetting, **kwargs) -> list[Document]:
         text_docs = ExtractProcessor.extract(
-            extract_setting=extract_setting, is_automatic=kwargs.get("process_rule_mode") == "automatic"
+            extract_setting=extract_setting,
+            is_automatic=(
+                kwargs.get("process_rule_mode") == "automatic" or kwargs.get("process_rule_mode") == "hierarchical"
+            ),
         )
         return text_docs
 
     def transform(self, documents: list[Document], **kwargs) -> list[Document]:
+        process_rule = kwargs.get("process_rule")
+        rules = Rule(**process_rule.get("rules"))
         splitter = self._get_splitter(
-            processing_rule=kwargs.get("process_rule"), embedding_model_instance=kwargs.get("embedding_model_instance")
+            processing_rule_mode=process_rule.get("mode"),
+            max_tokens=rules.segmentation.max_tokens,
+            chunk_overlap=rules.segmentation.chunk_overlap,
+            separator=rules.segmentation.separator,
+            embedding_model_instance=kwargs.get("embedding_model_instance"),
         )
 
         # Split the text documents into nodes.
@@ -96,12 +106,12 @@ class QAIndexProcessor(BaseIndexProcessor):
             raise ValueError(str(e))
         return text_docs
 
-    def load(self, dataset: Dataset, documents: list[Document], with_keywords: bool = True):
+    def load(self, dataset: Dataset, documents: list[Document], with_keywords: bool = True, **kwargs):
         if dataset.indexing_technique == "high_quality":
             vector = Vector(dataset)
             vector.create(documents)
 
-    def clean(self, dataset: Dataset, node_ids: Optional[list[str]], with_keywords: bool = True):
+    def clean(self, dataset: Dataset, node_ids: Optional[list[str]], with_keywords: bool = True, **kwargs):
         vector = Vector(dataset)
         if node_ids:
             vector.delete_by_ids(node_ids)
