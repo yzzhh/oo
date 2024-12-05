@@ -24,7 +24,7 @@ import {
 import { useFeaturesStore } from '@/app/components/base/features/hooks'
 import { AudioPlayerManager } from '@/app/components/base/audio-btn/audio.player.manager'
 import {
-  getProcessedFilesFromResponse,
+  getFilesInLogs,
 } from '@/app/components/base/file-uploader/utils'
 
 export const useWorkflowRun = () => {
@@ -221,7 +221,7 @@ export const useWorkflowRun = () => {
             draft.result = {
               ...draft.result,
               ...data,
-              files: getProcessedFilesFromResponse(data.files || []),
+              files: getFilesInLogs(data.outputs),
             } as any
             if (isStringOutput) {
               draft.resultTabActive = true
