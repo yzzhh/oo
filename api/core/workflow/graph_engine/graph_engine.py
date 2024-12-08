@@ -132,6 +132,7 @@ class GraphEngine:
     def run(self) -> Generator[GraphEngineEvent, None, None]:
         # trigger graph run start event
         yield GraphRunStartedEvent()
+        handle_exceptions = []
 
         try:
             if self.init_params.workflow_type == WorkflowType.CHAT:
@@ -144,7 +145,6 @@ class GraphEngine:
                 )
 
             # run graph
-            handle_exceptions = []
             generator = stream_processor.process(
                 self._run(start_node_id=self.graph.root_node_id, handle_exceptions=handle_exceptions)
             )
@@ -184,22 +184,21 @@ class GraphEngine:
                     yield GraphRunFailedEvent(error=str(e), exceptions_count=len(handle_exceptions))
                     return
             # count exceptions to determine partial success
-            exceptions_count = len(handle_exceptions)
-            if exceptions_count > 0:
+            if len(handle_exceptions) > 0:
                 yield GraphRunPartialSucceededEvent(
-                    exceptions_count=exceptions_count, outputs=self.graph_runtime_state.outputs
+                    exceptions_count=len(handle_exceptions), outputs=self.graph_runtime_state.outputs
                 )
             else:
                 # trigger graph run success event
                 yield GraphRunSucceededEvent(outputs=self.graph_runtime_state.outputs)
             self._release_thread()
         except GraphRunFailedError as e:
-            yield GraphRunFailedEvent(error=e.error, exceptions_count=exceptions_count)
+            yield GraphRunFailedEvent(error=e.error, exceptions_count=len(handle_exceptions))
             self._release_thread()
             return
         except Exception as e:
             logger.exception("Unknown Error when graph running")
-            yield GraphRunFailedEvent(error=str(e), exceptions_count=exceptions_count)
+            yield GraphRunFailedEvent(error=str(e), exceptions_count=len(handle_exceptions))
             self._release_thread()
             raise e
 
@@ -376,6 +375,7 @@ class GraphEngine:
                                 edge_mappings=sub_edge_mappings,
                                 in_parallel_id=in_parallel_id,
                                 parallel_start_node_id=parallel_start_node_id,
+                                handle_exceptions=handle_exceptions,
                             )
 
                             for item in parallel_generator:
@@ -401,6 +401,7 @@ class GraphEngine:
                         edge_mappings=edge_mappings,
                         in_parallel_id=in_parallel_id,
                         parallel_start_node_id=parallel_start_node_id,
+                        handle_exceptions=handle_exceptions,
                     )
 
                     for item in parallel_generator:
@@ -422,6 +423,7 @@ class GraphEngine:
         edge_mappings: list[GraphEdge],
         in_parallel_id: Optional[str] = None,
         parallel_start_node_id: Optional[str] = None,
+        handle_exceptions: list[str] = [],
     ) -> Generator[GraphEngineEvent | str, None, None]:
         # if nodes has no run conditions, parallel run all nodes
         parallel_id = self.graph.node_parallel_mapping.get(edge_mappings[0].target_node_id)
@@ -465,6 +467,7 @@ class GraphEngine:
                     "parallel_start_node_id": edge.target_node_id,
                     "parent_parallel_id": in_parallel_id,
                     "parent_parallel_start_node_id": parallel_start_node_id,
+                    "handle_exceptions": handle_exceptions,
                 },
             )
 
@@ -508,6 +511,7 @@ class GraphEngine:
         parallel_start_node_id: str,
         parent_parallel_id: Optional[str] = None,
         parent_parallel_start_node_id: Optional[str] = None,
+        handle_exceptions: list[str] = [],
     ) -> None:
         """
         Run parallel nodes
@@ -529,6 +533,7 @@ class GraphEngine:
                     in_parallel_id=parallel_id,
                     parent_parallel_id=parent_parallel_id,
                     parent_parallel_start_node_id=parent_parallel_start_node_id,
+                    handle_exceptions=handle_exceptions,
                 )
 
                 for item in generator:
