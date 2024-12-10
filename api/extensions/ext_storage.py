@@ -1,31 +1,46 @@
 import logging
-from collections.abc import Generator
+from collections.abc import Callable, Generator, Mapping
 from typing import Union
 
 from flask import Flask
 
 from configs import dify_config
+from configs.middleware.storage.opendal_storage_config import OpenDALScheme
 from dify_app import DifyApp
 from extensions.storage.base_storage import BaseStorage
 from extensions.storage.storage_type import StorageType
 
 
 class Storage:
-    def __init__(self):
-        self.storage_runner = None
-
     def init_app(self, app: Flask):
         storage_factory = self.get_storage_factory(dify_config.STORAGE_TYPE)
         with app.app_context():
             self.storage_runner = storage_factory()
 
     @staticmethod
-    def get_storage_factory(storage_type: str) -> type[BaseStorage]:
+    def get_storage_factory(storage_type: str) -> Callable[[], BaseStorage]:
         match storage_type:
             case StorageType.S3:
-                from extensions.storage.aws_s3_storage import AwsS3Storage
+                from extensions.storage.opendal_storage import OpenDALStorage
 
-                return AwsS3Storage
+                if dify_config.S3_USE_AWS_MANAGED_IAM:
+                    kwargs = {
+                        "root": "/",
+                        "bucket": dify_config.S3_BUCKET_NAME,
+                        "server_side_encryption": "aws:kms",
+                        "region": dify_config.S3_REGION,
+                    }
+                else:
+                    kwargs = {
+                        "root": "/",
+                        "bucket": dify_config.S3_BUCKET_NAME,
+                        "endpoint": dify_config.S3_ENDPOINT,
+                        "access_key_id": dify_config.S3_ACCESS_KEY,
+                        "secret_access_key": dify_config.S3_SECRET_KEY,
+                        "region": dify_config.S3_REGION,
+                    }
+
+                return lambda: OpenDALStorage(scheme=OpenDALScheme.S3, **kwargs)
             case StorageType.AZURE_BLOB:
                 from extensions.storage.azure_blob_storage import AzureBlobStorage
 
@@ -62,10 +77,20 @@ class Storage:
                 from extensions.storage.supabase_storage import SupabaseStorage
 
                 return SupabaseStorage
-            case StorageType.LOCAL | _:
-                from extensions.storage.local_fs_storage import LocalFsStorage
+            case StorageType.OPENDAL:
+                from extensions.storage.opendal_storage import OpenDALStorage
 
-                return LocalFsStorage
+                kwargs = _load_opendal_storage_kwargs_by_scheme(dify_config.STORAGE_OPENDAL_SCHEME)
+                return lambda: OpenDALStorage(scheme=dify_config.STORAGE_OPENDAL_SCHEME, **kwargs)
+            case StorageType.LOCAL:
+                from extensions.storage.opendal_storage import OpenDALStorage
+
+                kwargs = {
+                    "root": dify_config.STORAGE_LOCAL_PATH,
+                }
+                return lambda: OpenDALStorage(scheme=OpenDALScheme.FS, **kwargs)
+            case _:
+                raise ValueError(f"Unsupported storage type {storage_type}")
 
     def save(self, filename, data):
         try:
@@ -118,6 +143,32 @@ class Storage:
         except Exception as e:
             logging.exception(f"Failed to delete file {filename}")
             raise e
+
+
+def _load_opendal_storage_kwargs_by_scheme(scheme: OpenDALScheme, /) -> Mapping[str, str]:
+    match scheme:
+        case OpenDALScheme.FS:
+            return {
+                "root": dify_config.OPENDAL_FS_ROOT,
+            }
+        case OpenDALScheme.S3:
+            if dify_config.OPENDAL_S3_SERVER_SIDE_ENCRYPTION == "aws:kms":
+                return {
+                    "root": dify_config.OPENDAL_S3_ROOT,
+                    "bucket": dify_config.OPENDAL_S3_BUCKET,
+                    "server_side_encryption": dify_config.OPENDAL_S3_SERVER_SIDE_ENCRYPTION,
+                    "region": dify_config.OPENDAL_S3_REGION,
+                }
+            return {
+                "root": dify_config.OPENDAL_S3_ROOT,
+                "bucket": dify_config.OPENDAL_S3_BUCKET,
+                "endpoint": dify_config.OPENDAL_S3_ENDPOINT,
+                "access_key_id": dify_config.OPENDAL_S3_ACCESS_KEY_ID,
+                "secret_access_key": dify_config.OPENDAL_S3_SECRET_ACCESS_KEY,
+                "region": dify_config.OPENDAL_S3_REGION,
+            }
+        case _:
+            raise ValueError(f"Unsupported OpenDAL scheme {scheme}")
 
 
 storage = Storage()
