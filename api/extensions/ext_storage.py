@@ -23,6 +23,9 @@ class Storage:
     def get_storage_factory(storage_type: str) -> Callable[[], BaseStorage]:
         match storage_type:
             case StorageType.S3:
+                from extensions.storage.aws_s3_storage import AwsS3Storage
+
+                return AwsS3Storage
                 from extensions.storage.opendal_storage import OpenDALStorage
 
                 if dify_config.S3_USE_AWS_MANAGED_IAM:
