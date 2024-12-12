@@ -22,8 +22,9 @@ class SecurityConfig(BaseSettings):
 
     SECRET_KEY: str = Field(
         description="Secret key for secure session cookie signing."
-        "Make sure you are changing this key for your deployment with a strong key."
-        "Generate a strong key using `openssl rand -base64 42` or set via the `SECRET_KEY` environment variable.",
+                    "Make sure you are changing this key for your deployment with a strong key."
+                    "Generate a strong key using `openssl rand -base64 42` "
+                    "or set via the `SECRET_KEY` environment variable.",
         default="",
     )
 
@@ -141,7 +142,7 @@ class EndpointConfig(BaseSettings):
 
     CONSOLE_API_URL: str = Field(
         description="Base URL for the console API,"
-        "used for login authentication callback or notion integration callbacks",
+                    "used for login authentication callback or notion integration callbacks",
         default="",
     )
 
@@ -168,8 +169,8 @@ class FileAccessConfig(BaseSettings):
 
     FILES_URL: str = Field(
         description="Base URL for file preview or download,"
-        " used for frontend display and multi-model inputs"
-        "Url is signed and has expiration time.",
+                    " used for frontend display and multi-model inputs"
+                    "Url is signed and has expiration time.",
         validation_alias=AliasChoices("FILES_URL", "CONSOLE_API_URL"),
         alias_priority=1,
         default="",
@@ -318,7 +319,7 @@ class HttpConfig(BaseSettings):
 
     RESPECT_XFORWARD_HEADERS_ENABLED: bool = Field(
         description="Enable or disable the X-Forwarded-For Proxy Fix middleware from Werkzeug"
-        " to respect X-* headers to redirect clients",
+                    " to respect X-* headers to redirect clients",
         default=False,
     )
 
@@ -571,7 +572,7 @@ class RagEtlConfig(BaseSettings):
 
     KEYWORD_DATA_SOURCE_TYPE: str = Field(
         description="Data source type for keyword extraction"
-        " ('database' or other supported types), default to 'database'",
+                    " ('database' or other supported types), default to 'database'",
         default="database",
     )
 
@@ -751,6 +752,18 @@ class LoginConfig(BaseSettings):
     )
 
 
+class PrometheusConfig(BaseSettings):
+    HISTOGRAM_BUCKETS_1MIN: list[float] = Field(
+        description="The buckets of Prometheus histogram under 1 minute",
+        default=[0.1, 0.2, 0.5, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 12, 14, 16, 18, 20, 25, 30, 40, 50, 60],
+    )
+
+    HISTOGRAM_BUCKETS_5MIN: list[float] = Field(
+        description="The buckets of Prometheus histogram under 5 minute",
+        default=[0.1, 0.2, 0.5, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 12, 14, 16, 18, 20, 25, 30, 40, 50, 60, 120, 180, 300],
+    )
+
+
 class FeatureConfig(
     # place the configs in alphabet order
     AppExecutionConfig,
@@ -777,6 +790,7 @@ class FeatureConfig(
     WorkflowConfig,
     WorkspaceConfig,
     LoginConfig,
+    PrometheusConfig,
     # hosted services config
     HostedServiceConfig,
     CeleryBeatConfig,

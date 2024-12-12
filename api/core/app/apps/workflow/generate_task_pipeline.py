@@ -340,6 +340,9 @@ class WorkflowAppGenerateTaskPipeline(BasedGenerateTaskPipeline, WorkflowCycleMa
                     conversation_id=None,
                     trace_manager=trace_manager,
                 )
+                self._workflow_time_it(
+                    is_success=True, graph_runtime_state=graph_runtime_state, workflow_run=workflow_run
+                )
 
                 # save workflow app log
                 self._save_workflow_app_log(workflow_run)
@@ -363,6 +366,9 @@ class WorkflowAppGenerateTaskPipeline(BasedGenerateTaskPipeline, WorkflowCycleMa
                     exceptions_count=event.exceptions_count,
                     conversation_id=None,
                     trace_manager=trace_manager,
+                )
+                self._workflow_time_it(
+                    is_success=False, graph_runtime_state=graph_runtime_state, workflow_run=workflow_run
                 )
 
                 # save workflow app log
