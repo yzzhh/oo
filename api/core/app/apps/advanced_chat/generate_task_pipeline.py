@@ -310,6 +310,9 @@ class AdvancedChatAppGenerateTaskPipeline(BasedGenerateTaskPipeline, WorkflowCyc
                 # Record files if it's an answer node or end node
                 if event.node_type in [NodeType.ANSWER, NodeType.END]:
                     self._recorded_files.extend(self._fetch_files_from_node_outputs(event.outputs or {}))
+                # tricy way to solve #11542 and others for now FIXME when have a better solution
+                if event.node_type == NodeType.ANSWER:
+                    yield self._message_to_stream_response(answer=event.node_data.answer, message_id=self._message.id)
 
                 response = self._workflow_node_finish_to_stream_response(
                     event=event,
@@ -497,9 +500,10 @@ class AdvancedChatAppGenerateTaskPipeline(BasedGenerateTaskPipeline, WorkflowCyc
                     tts_publisher.publish(message=queue_message)
 
                 self._task_state.answer += delta_text
-                yield self._message_to_stream_response(
-                    answer=delta_text, message_id=self._message.id, from_variable_selector=event.from_variable_selector
-                )
+                # tricy way to solve #11542 and others for now FIXME when have a better solution
+                # yield self._message_to_stream_response(
+                #    answer=delta_text, message_id=self._message.id, from_variable_selector=event.from_variable_selector
+                # )
             elif isinstance(event, QueueMessageReplaceEvent):
                 # published by moderation
                 yield self._message_replace_to_stream_response(answer=event.text)
