@@ -3828,13 +3828,13 @@ setuptools = "*"
 
 [[package]]
 name = "gunicorn"
-version = "22.0.0"
+version = "23.0.0"
 description = "WSGI HTTP Server for UNIX"
 optional = false
 python-versions = ">=3.7"
 files = [
-    {file = "gunicorn-22.0.0-py3-none-any.whl", hash = "sha256:350679f91b24062c86e386e198a15438d53a7a8207235a78ba1b53df4c4378d9"},
-    {file = "gunicorn-22.0.0.tar.gz", hash = "sha256:4a0b436239ff76fb33f11c07a16482c521a7e09c1ce3cc293c2330afe01bec63"},
+    {file = "gunicorn-23.0.0-py3-none-any.whl", hash = "sha256:ec400d38950de4dfd418cff8328b2c8faed0edb0d517d3394e457c317908ca4d"},
+    {file = "gunicorn-23.0.0.tar.gz", hash = "sha256:f014447a0101dc57e294f6c18ca6b40227a4c90e9bdb586042628030cba004ec"},
 ]
 
 [package.dependencies]
@@ -6406,13 +6406,13 @@ files = [
 
 [[package]]
 name = "opik"
-version = "1.2.3"
+version = "1.2.6"
 description = "Comet tool for logging and evaluating LLM traces"
 optional = false
 python-versions = ">=3.8"
 files = [
-    {file = "opik-1.2.3-py3-none-any.whl", hash = "sha256:2c496626d6af672fe7f85b6b17adab01decc65c91c1f18f8198158ea4146f47f"},
-    {file = "opik-1.2.3.tar.gz", hash = "sha256:36964d979c5d38438bea0ac7c8f65c962c6601f893a7683419d95d308d204af6"},
+    {file = "opik-1.2.6-py3-none-any.whl", hash = "sha256:6a448c0b9c716c74560259f40b3e0f62c1f43b74fd326c0374bcfcd31a650f31"},
+    {file = "opik-1.2.6.tar.gz", hash = "sha256:0cc258e64b685c1291cf79ac8a9edc9e9ec5850e0f404155044ec7a04475cdb5"},
 ]
 
 [package.dependencies]
@@ -11258,4 +11258,4 @@ cffi = ["cffi (>=1.11)"]
 [metadata]
 lock-version = "2.0"
 python-versions = ">=3.11,<3.13"
-content-hash = "4a6532bf8ed3ed0fd567a25b4ed2053e2d9f865ee077256fefd73ea1e702f8a1"
+content-hash = "ff5657df49c2c73d679c96208d53ca2578d4a15aff3cea4085eb5a827747b719"
