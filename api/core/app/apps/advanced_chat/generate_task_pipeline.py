@@ -311,7 +311,8 @@ class AdvancedChatAppGenerateTaskPipeline(BasedGenerateTaskPipeline, WorkflowCyc
                 if event.node_type in [NodeType.ANSWER, NodeType.END]:
                     self._recorded_files.extend(self._fetch_files_from_node_outputs(event.outputs or {}))
                 # tricy way to solve #11542 and others for now FIXME when have a better solution
-                if event.node_type == NodeType.ANSWER:
+                # if it is llm.text we do not need to output them
+                if event.node_type == NodeType.ANSWER and event.node_data.answer != "{{#llm.text#}}":
                     yield self._message_to_stream_response(answer=event.node_data.answer, message_id=self._message.id)
 
                 response = self._workflow_node_finish_to_stream_response(
@@ -498,12 +499,15 @@ class AdvancedChatAppGenerateTaskPipeline(BasedGenerateTaskPipeline, WorkflowCyc
                 # only publish tts message at text chunk streaming
                 if tts_publisher:
                     tts_publisher.publish(message=queue_message)
-
                 self._task_state.answer += delta_text
                 # tricy way to solve #11542 and others for now FIXME when have a better solution
-                # yield self._message_to_stream_response(
-                #    answer=delta_text, message_id=self._message.id, from_variable_selector=event.from_variable_selector
-                # )
+                # if the event from_variable_selector is answer we do not stream output it
+                if event.from_variable_selector and event.from_variable_selector[-1] != "answer":
+                    yield self._message_to_stream_response(
+                        answer=delta_text,
+                        message_id=self._message.id,
+                        from_variable_selector=event.from_variable_selector,
+                    )
             elif isinstance(event, QueueMessageReplaceEvent):
                 # published by moderation
                 yield self._message_replace_to_stream_response(answer=event.text)
