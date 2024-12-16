@@ -1,6 +1,7 @@
 'use client'
 import React, { useMemo, useState } from 'react'
 import { useTranslation } from 'react-i18next'
+import { RiArrowRightLine, RiFolder6Line } from '@remixicon/react'
 import FilePreview from '../file-preview'
 import FileUploader from '../file-uploader'
 import NotionPagePreview from '../notion-page-preview'
@@ -17,6 +18,7 @@ import { NotionPageSelector } from '@/app/components/base/notion-page-selector'
 import { useDatasetDetailContext } from '@/context/dataset-detail'
 import { useProviderContext } from '@/context/provider-context'
 import VectorSpaceFull from '@/app/components/billing/vector-space-full'
+import classNames from '@/utils/classnames'
 
 type IStepOneProps = {
   datasetId?: string
@@ -120,18 +122,18 @@ const StepOne = ({
       return true
     if (isShowVectorSpaceFull)
       return true
-
     return false
-  }, [files])
+  }, [files, isShowVectorSpaceFull])
+
   return (
     <div className='flex w-full h-full'>
       <div className='grow overflow-y-auto relative'>
         {
           shouldShowDataSourceTypeList && (
-            <div className={s.stepHeader}>{t('datasetCreation.steps.one')}</div>
+            <div className={classNames(s.stepHeader, 'text-text-secondary')}>{t('datasetCreation.steps.one')}</div>
           )
         }
-        <div className={s.form}>
+        <div className={classNames(s.form)}>
           {
             shouldShowDataSourceTypeList && (
               <div className='flex items-center mb-8 flex-wrap gap-y-4'>
@@ -199,7 +201,15 @@ const StepOne = ({
                   <VectorSpaceFull />
                 </div>
               )}
-              <Button disabled={nextDisabled} className={s.submitButton} variant='primary' onClick={onStepChange}>{t('datasetCreation.stepOne.button')}</Button>
+              <div className="flex justify-end gap-2 max-w-[640px]">
+                {/* <Button>{t('datasetCreation.stepOne.cancel')}</Button> */}
+                <Button disabled={nextDisabled} variant='primary' onClick={onStepChange}>
+                  <span className="flex gap-0.5 px-[10px]">
+                    <span className="px-0.5">{t('datasetCreation.stepOne.button')}</span>
+                    <RiArrowRightLine className="size-4" />
+                  </span>
+                </Button>
+              </div>
             </>
           )}
           {dataSourceType === DataSourceType.NOTION && (
@@ -219,7 +229,15 @@ const StepOne = ({
                       <VectorSpaceFull />
                     </div>
                   )}
-                  <Button disabled={isShowVectorSpaceFull || !notionPages.length} className={s.submitButton} variant='primary' onClick={onStepChange}>{t('datasetCreation.stepOne.button')}</Button>
+                  <div className="flex justify-end gap-2 max-w-[640px]">
+                    {/* <Button>{t('datasetCreation.stepOne.cancel')}</Button> */}
+                    <Button disabled={isShowVectorSpaceFull || !notionPages.length} variant='primary' onClick={onStepChange}>
+                      <span className="flex gap-0.5 px-[10px]">
+                        <span className="px-0.5">{t('datasetCreation.stepOne.button')}</span>
+                        <RiArrowRightLine className="size-4" />
+                      </span>
+                    </Button>
+                  </div>
                 </>
               )}
             </>
@@ -242,13 +260,24 @@ const StepOne = ({
                   <VectorSpaceFull />
                 </div>
               )}
-              <Button disabled={isShowVectorSpaceFull || !websitePages.length} className={s.submitButton} variant='primary' onClick={onStepChange}>{t('datasetCreation.stepOne.button')}</Button>
+              <div className="flex justify-end gap-2 max-w-[640px]">
+                {/* <Button>{t('datasetCreation.stepOne.cancel')}</Button> */}
+                <Button disabled={isShowVectorSpaceFull || !websitePages.length} variant='primary' onClick={onStepChange}>
+                  <span className="flex gap-0.5 px-[10px]">
+                    <span className="px-0.5">{t('datasetCreation.stepOne.button')}</span>
+                    <RiArrowRightLine className="size-4" />
+                  </span>
+                </Button>
+              </div>
             </>
           )}
           {!datasetId && (
             <>
               <div className={s.dividerLine} />
-              <div onClick={modalShowHandle} className={s.OtherCreationOption}>{t('datasetCreation.stepOne.emptyDatasetCreation')}</div>
+              <span className="inline-flex items-center cursor-pointer text-[13px] leading-4 text-text-accent" onClick={modalShowHandle}>
+                <RiFolder6Line className="size-4 mr-1" />
+                {t('datasetCreation.stepOne.emptyDatasetCreation')}
+              </span>
             </>
           )}
         </div>

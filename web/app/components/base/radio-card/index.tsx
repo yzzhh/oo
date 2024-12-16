@@ -26,12 +26,14 @@ const RadioCard: FC<Props> = ({
   onChosen = () => { },
   chosenConfig,
   chosenConfigWrapClassName,
+  className,
 }) => {
   return (
     <div
       className={cn(
         'border border-components-option-card-option-border bg-components-option-card-option-bg rounded-xl hover:shadow-xs cursor-pointer',
         isChosen && 'bg-components-option-card-option-selected-bg border-components-panel-border shadow-xs',
+        className,
       )}
     >
       <div className='flex py-3 pl-3 pr-4' onClick={onChosen}>
@@ -39,8 +41,8 @@ const RadioCard: FC<Props> = ({
           {icon}
         </div>
         <div className='grow'>
-          <div className='leading-5 text-sm font-medium text-gray-900'>{title}</div>
-          <div className='leading-[18px] text-xs font-normal text-[#667085]'>{description}</div>
+          <div className='leading-5 text-sm font-medium text-text-secondary'>{title}</div>
+          <div className='leading-[18px] text-xs font-normal text-text-tertiary'>{description}</div>
         </div>
         {!noRadio && (
           <div className='shrink-0 flex items-center h-8'>
@@ -52,7 +54,7 @@ const RadioCard: FC<Props> = ({
         )}
       </div>
       {((isChosen && chosenConfig) || noRadio) && (
-        <div className={cn(chosenConfigWrapClassName, 'p-3 border-t border-gray-200')}>
+        <div className={cn(chosenConfigWrapClassName, 'p-3')}>
           {chosenConfig}
         </div>
       )}

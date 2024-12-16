@@ -17,7 +17,7 @@ import Textarea from '@/app/components/base/textarea'
 import Divider from '@/app/components/base/divider'
 import { ApiConnectionMod } from '@/app/components/base/icons/src/vender/solid/development'
 import { updateDatasetSetting } from '@/service/datasets'
-import type { DataSetListResponse } from '@/models/datasets'
+import { type DataSetListResponse } from '@/models/datasets'
 import DatasetDetailContext from '@/context/dataset-detail'
 import { type RetrievalConfig } from '@/types/app'
 import { useAppContext } from '@/context/app-context'
@@ -234,6 +234,7 @@ const Form = () => {
                 disable={!currentDataset?.embedding_available}
                 value={indexMethod}
                 onChange={v => setIndexMethod(v)}
+                docForm={currentDataset.doc_form}
               />
             </div>
           </div>
@@ -305,7 +306,7 @@ const Form = () => {
             <div>
               <div className='text-text-secondary system-sm-semibold'>{t('datasetSettings.form.retrievalSetting.title')}</div>
               <div className='leading-[18px] text-xs font-normal text-gray-500'>
-                <a target='_blank' rel='noopener noreferrer' href='https://docs.dify.ai/guides/knowledge-base/create-knowledge-and-upload-documents#id-4-retrieval-settings' className='text-[#155eef]'>{t('datasetSettings.form.retrievalSetting.learnMore')}</a>
+                <a target='_blank' rel='noopener noreferrer' href='https://docs.dify.ai/guides/knowledge-base/create-knowledge-and-upload-documents#id-4-retrieval-settings' className='text-text-accent'>{t('datasetSettings.form.retrievalSetting.learnMore')}</a>
                 {t('datasetSettings.form.retrievalSetting.description')}
               </div>
             </div>

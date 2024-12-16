@@ -6,13 +6,11 @@
   font-weight: 600;
   font-size: 18px;
   line-height: 28px;
-  color: #101828;
 }
 
 .form {
   position: relative;
   padding: 12px 64px;
-  background-color: #fff;
 }
 
 .dataSourceItem {
@@ -88,23 +86,6 @@
   max-width: 640px;
   height: 1px;
   background-color: #eaecf0;
-}
-
-.OtherCreationOption {
-  @apply flex items-center cursor-pointer;
-  font-weight: 500;
-  font-size: 13px;
-  line-height: 18px;
-  color: #155EEF;
-}
-.OtherCreationOption::before {
-  content: '';
-  display: block;
-  margin-right: 4px;
-  width: 16px;
-  height: 16px;
-  background: center no-repeat url(../assets/folder-plus.svg);
-  background-size: contain;
 }
 
 .notionConnectionTip {

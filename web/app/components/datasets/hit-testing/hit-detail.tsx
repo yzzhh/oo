@@ -1,7 +1,7 @@
 import type { FC } from 'react'
 import React from 'react'
 import { useTranslation } from 'react-i18next'
-import { SegmentIndexTag } from '../documents/detail/completed'
+import { SegmentIndexTag } from '../documents/detail/completed/common/segment-index-tag'
 import s from '../documents/detail/completed/style.module.css'
 import cn from '@/utils/classnames'
 import type { SegmentDetailModel } from '@/models/datasets'
@@ -42,7 +42,7 @@ const HitDetail: FC<IHitDetailProps> = ({ segInfo }) => {
           />
           <div className={cn(s.commonIcon, s.typeSquareIcon)} />
           <span className={cn('mr-6', s.numberInfo)}>
-            {segInfo?.word_count} {t('datasetDocuments.segment.characters')}
+            {segInfo?.word_count} {t('datasetDocuments.segment.characters', { count: segInfo?.word_count || 0 })}
           </span>
           <div className={cn(s.commonIcon, s.targetIcon)} />
           <span className={s.numberInfo}>
