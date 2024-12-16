@@ -381,7 +381,9 @@ class AdvancedChatAppGenerateTaskPipeline(BasedGenerateTaskPipeline, WorkflowCyc
                     conversation_id=self._conversation.id,
                     trace_manager=trace_manager,
                 )
-
+                self._workflow_time_it(
+                    is_success=True, graph_runtime_state=graph_runtime_state, workflow_run=workflow_run
+                )
                 yield self._workflow_finish_to_stream_response(
                     task_id=self._application_generate_entity.task_id, workflow_run=workflow_run
                 )
@@ -403,6 +405,9 @@ class AdvancedChatAppGenerateTaskPipeline(BasedGenerateTaskPipeline, WorkflowCyc
                     exceptions_count=event.exceptions_count,
                     conversation_id=None,
                     trace_manager=trace_manager,
+                )
+                self._workflow_time_it(
+                    is_success=False, graph_runtime_state=graph_runtime_state, workflow_run=workflow_run
                 )
 
                 yield self._workflow_finish_to_stream_response(
@@ -428,7 +433,9 @@ class AdvancedChatAppGenerateTaskPipeline(BasedGenerateTaskPipeline, WorkflowCyc
                     trace_manager=trace_manager,
                     exceptions_count=event.exceptions_count,
                 )
-
+                self._workflow_time_it(
+                    is_success=False, graph_runtime_state=graph_runtime_state, workflow_run=workflow_run
+                )
                 yield self._workflow_finish_to_stream_response(
                     task_id=self._application_generate_entity.task_id, workflow_run=workflow_run
                 )
