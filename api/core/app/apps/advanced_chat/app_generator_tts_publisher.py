@@ -4,6 +4,7 @@ import logging
 import queue
 import re
 import threading
+from typing import Optional
 
 from core.app.entities.queue_entities import (
     QueueAgentMessageEvent,
@@ -49,8 +50,10 @@ class AppGeneratorTTSPublisher:
         self.logger = logging.getLogger(__name__)
         self.tenant_id = tenant_id
         self.msg_text = ""
-        self._audio_queue = queue.Queue()
-        self._msg_queue = queue.Queue()
+        self._audio_queue: queue.Queue[AudioTrunk] = queue.Queue()
+        self._msg_queue: queue.Queue[
+            QueueAgentMessageEvent | QueueLLMChunkEvent | QueueTextChunkEvent | QueueNodeSucceededEvent
+        ] = queue.Queue()
         self.match = re.compile(r"[。.!?]")
         self.model_manager = ModelManager()
         self.model_instance = self.model_manager.get_default_model_instance(
@@ -62,8 +65,9 @@ class AppGeneratorTTSPublisher:
         if not voice or voice not in values:
             self.voice = self.voices[0].get("value")
         self.MAX_SENTENCE = 2
-        self._last_audio_event = None
-        self._runtime_thread = threading.Thread(target=self._runtime).start()
+        self._last_audio_event: Optional[AudioTrunk] = None
+        # FIXME better way to handle this threading.start
+        threading.Thread(target=self._runtime).start()
         self.executor = concurrent.futures.ThreadPoolExecutor(max_workers=3)
 
     def publish(self, message):
@@ -73,7 +77,7 @@ class AppGeneratorTTSPublisher:
             self.logger.warning(e)
 
     def _runtime(self):
-        future_queue = queue.Queue()
+        future_queue: queue.Queue = queue.Queue()
         threading.Thread(target=_process_future, args=(future_queue, self._audio_queue)).start()
         while True:
             try:
@@ -115,11 +119,10 @@ class AppGeneratorTTSPublisher:
             if self._last_audio_event and self._last_audio_event.status == "finish":
                 if self.executor:
                     self.executor.shutdown(wait=False)
-                return self.last_message
+                return self._last_audio_event
             audio = self._audio_queue.get_nowait()
             if audio and audio.status == "finish":
                 self.executor.shutdown(wait=False)
-                self._runtime_thread = None
             if audio:
                 self._last_audio_event = audio
             return audio

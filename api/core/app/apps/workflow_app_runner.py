@@ -185,7 +185,9 @@ class WorkflowBasedAppRunner(AppRunner):
                 QueueWorkflowPartialSuccessEvent(outputs=event.outputs, exceptions_count=event.exceptions_count)
             )
         elif isinstance(event, GraphRunFailedEvent):
-            self._publish_event(QueueWorkflowFailedEvent(error=event.error, exceptions_count=event.exceptions_count))
+            self._publish_event(
+                QueueWorkflowFailedEvent(error=event.error, exceptions_count=event.exceptions_count or 0)
+            )
         elif isinstance(event, NodeRunStartedEvent):
             self._publish_event(
                 QueueNodeStartedEvent(
@@ -216,13 +218,13 @@ class WorkflowBasedAppRunner(AppRunner):
                     parent_parallel_id=event.parent_parallel_id,
                     parent_parallel_start_node_id=event.parent_parallel_start_node_id,
                     start_at=event.route_node_state.start_at,
-                    inputs=event.route_node_state.node_run_result.inputs
+                    inputs=cast(dict[str, Any], event.route_node_state.node_run_result.inputs)
                     if event.route_node_state.node_run_result
                     else {},
                     process_data=event.route_node_state.node_run_result.process_data
                     if event.route_node_state.node_run_result
                     else {},
-                    outputs=event.route_node_state.node_run_result.outputs
+                    outputs=dict(event.route_node_state.node_run_result.outputs or {})
                     if event.route_node_state.node_run_result
                     else {},
                     execution_metadata=event.route_node_state.node_run_result.metadata
@@ -243,13 +245,13 @@ class WorkflowBasedAppRunner(AppRunner):
                     parent_parallel_id=event.parent_parallel_id,
                     parent_parallel_start_node_id=event.parent_parallel_start_node_id,
                     start_at=event.route_node_state.start_at,
-                    inputs=event.route_node_state.node_run_result.inputs
+                    inputs=cast(dict[str, Any], event.route_node_state.node_run_result.inputs)
                     if event.route_node_state.node_run_result
                     else {},
                     process_data=event.route_node_state.node_run_result.process_data
                     if event.route_node_state.node_run_result
                     else {},
-                    outputs=event.route_node_state.node_run_result.outputs
+                    outputs=dict(event.route_node_state.node_run_result.outputs or {})
                     if event.route_node_state.node_run_result
                     else {},
                     error=event.route_node_state.node_run_result.error
@@ -303,13 +305,13 @@ class WorkflowBasedAppRunner(AppRunner):
                     parent_parallel_id=event.parent_parallel_id,
                     parent_parallel_start_node_id=event.parent_parallel_start_node_id,
                     start_at=event.route_node_state.start_at,
-                    inputs=event.route_node_state.node_run_result.inputs
+                    inputs=cast(dict[str, Any], event.route_node_state.node_run_result.inputs)
                     if event.route_node_state.node_run_result
                     else {},
                     process_data=event.route_node_state.node_run_result.process_data
                     if event.route_node_state.node_run_result
                     else {},
-                    outputs=event.route_node_state.node_run_result.outputs
+                    outputs=dict(event.route_node_state.node_run_result.outputs or {})
                     if event.route_node_state.node_run_result
                     else {},
                     execution_metadata=event.route_node_state.node_run_result.metadata

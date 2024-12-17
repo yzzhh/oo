@@ -11,7 +11,7 @@ from dify_app import DifyApp
 
 
 def init_app(app: DifyApp):
-    log_handlers = []
+    log_handlers: list[logging.Handler] = []
     log_file = dify_config.LOG_FILE
     if log_file:
         log_dir = os.path.dirname(log_file)
